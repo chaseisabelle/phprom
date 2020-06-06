@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"github.com/tidwall/resp"
 	"io"
 	"net"
+	"strconv"
 	"sync"
 )
 
@@ -29,6 +31,7 @@ type Registry struct {
 	metrics map[string]string
 }
 
+const METRICS = "metrics"
 const HISTOGRAM = "histogram"
 const COUNTER = "counter"
 const SUMMARY = "summary"
@@ -97,11 +100,98 @@ func handle(con net.Conn) error {
 	rdr := resp.NewReader(bufio.NewReader(con))
 
 	for {
-		val, _, err := rdr.ReadValue()
-		println(fmt.Sprintf("%+v", val))
+		raw, _, err := rdr.ReadValue()
 
 		if err == io.EOF {
 			return nil
+		}
+
+		arr := raw.Array()
+		cnt := len(arr)
+
+		if cnt == 0 {
+			return failure(con, errors.New("no command"))
+		}
+
+		if cnt > 6 {
+			return failure(con, errors.New("too many args"))
+		}
+
+		cmd := arr[0].String()
+
+		if cmd == "" {
+			return failure(con, errors.New("empty command"))
+		}
+
+		if cmd == METRICS {
+			if cnt > 1 {
+				return failure(con, errors.New("too many args"))
+			}
+
+			res, err := metrics()
+
+			if err != nil {
+				return failure(con, err)
+			}
+
+			err = respond(con, res)
+
+			if err != nil {
+				return failure(con, err)
+			}
+		}
+
+		name := ""
+		help := ""
+		val := float64(0)
+		labs := make(map[string]string, 0)
+		buck := make([]float64, 0)
+
+		switch cnt {
+		case 1:
+			err = errors.New("name required")
+		case 2:
+			err = errors.New("help required")
+		case 3:
+			err = errors.New("value required")
+		case 4:
+			name = arr[1].String()
+			help = arr[2].String()
+			val, err = strconv.ParseFloat(arr[3].String(), 64)
+		}
+
+		if err != nil {
+			return failure(con, err)
+		}
+
+		if cnt == 5 {
+			err = json.Unmarshal([]byte(arr[3].String()), &labs)
+
+			if err != nil {
+				return failure(con, err)
+			}
+		}
+
+		if cmd != HISTOGRAM && cnt > 5 {
+			return failure(con, errors.New("too many args"))
+		}
+
+		switch cmd {
+		case HISTOGRAM:
+			if cnt == 6 {
+				err = json.Unmarshal([]byte(arr[5].String()), &buck)
+
+				if err != nil {
+					return failure(con, err)
+				}
+			}
+
+			err = histogram(name, help, labs, buck, val)
+		case COUNTER:
+			err = counter(name, help, labs, val)
+		case GAUGE:
+			err = gauge(name, help, labs, val)
+		case 
 		}
 
 		if err != nil {
