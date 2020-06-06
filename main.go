@@ -1,14 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
-	"net/http"
+	"github.com/tidwall/resp"
+	"io"
+	"net"
 	"sync"
 )
 
@@ -46,92 +48,92 @@ func main() {
 
 	flag.Parse()
 
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", handle)
-
-	err := http.ListenAndServe(*host, mux)
+	lis, err := net.Listen("tcp4", *host)
 
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
-}
 
-func handle(res http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case "GET":
-		out, err := metrics()
+	defer func() {
+		err = lis.Close()
 
 		if err != nil {
-			fail(res, err, http.StatusBadRequest)
+			printerr(err)
+		}
+	}()
 
-			break
+	for {
+		con, err := lis.Accept()
+
+		if err != nil {
+			printerr(err)
+
+			continue
 		}
 
-		res.WriteHeader(http.StatusOK)
+		go func() {
+			err := handle(con)
 
-		cnt, err := res.Write([]byte(out))
-
-		if err != nil {
-			println(err.Error())
-
-			if cnt != 0 {
-				break
+			if err != nil {
+				printerr(err)
 			}
-
-			fail(res, err, http.StatusInternalServerError)
-		}
-	case "POST":
-		raw := &Payload{}
-		err := json.NewDecoder(req.Body).Decode(raw)
-
-		if err != nil {
-			fail(res, err, http.StatusBadRequest)
-
-			break
-		}
-
-		switch raw.Metric {
-		case HISTOGRAM:
-			fail(res, histogram(raw), http.StatusInternalServerError)
-		case COUNTER:
-			fail(res, counter(raw), http.StatusInternalServerError)
-		case SUMMARY:
-			fail(res, summary(raw), http.StatusInternalServerError)
-		case GAUGE:
-			fail(res, gauge(raw), http.StatusInternalServerError)
-		default:
-			fail(res, fmt.Errorf("invalid metric %s", raw.Metric), http.StatusBadRequest)
-		}
-	default:
-		fail(res, fmt.Errorf("method not allowed %s", req.Method), http.StatusMethodNotAllowed)
+		}()
 	}
 }
 
-func fail(res http.ResponseWriter, err error, stat int) {
-	if err == nil {
-		return
+func printerr(err error) {
+	println(err.Error())
+}
+
+func handle(con net.Conn) error {
+	defer func() {
+		err := con.Close()
+
+		if err != nil {
+			printerr(err)
+		}
+	}()
+
+	rdr := resp.NewReader(bufio.NewReader(con))
+
+	for {
+		val, _, err := rdr.ReadValue()
+		println(fmt.Sprintf("%+v", val))
+
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			return failure(con, err)
+		}
+
+		err = respond(con, "test")
+
+		if err != nil {
+			return failure(con, err)
+		}
 	}
+}
 
-	str := err.Error()
-
-	println(str)
-
-	enc, err := json.Marshal(struct {
-		Error string `json:"error"`
-	}{
-		Error: str,
-	})
+func respond(con net.Conn, res string) error {
+	buf := bytes.Buffer{}
+	wri := resp.NewWriter(&buf)
+	err := wri.WriteString(res)
 
 	if err != nil {
-		println(err.Error())
-
-		res.WriteHeader(http.StatusInternalServerError)
-
-		return
+		return err
 	}
 
-	http.Error(res, string(enc), stat)
+	_, err = con.Write(buf.Bytes())
+
+	return err
+}
+
+func failure(con net.Conn, err error) error {
+	printerr(err)
+
+	return respond(con, err.Error())
 }
 
 func keys(m map[string]string) []string {
