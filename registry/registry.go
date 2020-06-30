@@ -2,7 +2,6 @@ package registry
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/chaseisabelle/phprom/types"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,7 +13,6 @@ import (
 type Registry struct {
 	sync.Mutex
 	local      *prometheus.Registry
-	namespace  string
 	histograms map[string]*prometheus.HistogramVec
 	counters   map[string]*prometheus.CounterVec
 	summaries  map[string]*prometheus.SummaryVec
@@ -37,14 +35,9 @@ type Parameters struct {
 	}
 }
 
-func New(namespace string) (*Registry, error) {
-	if namespace == "" {
-		return nil, errors.New("empty namespace")
-	}
-
+func New() (*Registry, error) {
 	return &Registry{
 		local:      prometheus.NewRegistry(),
-		namespace:  namespace,
 		histograms: make(map[string]*prometheus.HistogramVec),
 		counters:   make(map[string]*prometheus.CounterVec),
 		summaries:  make(map[string]*prometheus.SummaryVec),
@@ -84,20 +77,17 @@ func (r *Registry) Register(parameters *Parameters) error {
 	switch kind {
 	case types.Histogram:
 		collector = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-			Namespace: r.Namespace(),
 			Name:      name,
 			Help:      help,
 			Buckets:   parameters.Histogram.Buckets,
 		}, labels)
 	case types.Counter:
 		collector = prometheus.NewCounterVec(prometheus.CounterOpts{
-			Namespace: r.Namespace(),
 			Name:      name,
 			Help:      help,
 		}, labels)
 	case types.Summary:
 		collector = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-			Namespace:  r.Namespace(),
 			Name:       name,
 			Help:       help,
 			Objectives: parameters.Summary.Objectives,
@@ -107,7 +97,6 @@ func (r *Registry) Register(parameters *Parameters) error {
 		}, labels)
 	case types.Gauge:
 		collector = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-			Namespace: r.Namespace(),
 			Name:      name,
 			Help:      help,
 		}, labels)
@@ -131,10 +120,6 @@ func (r *Registry) Register(parameters *Parameters) error {
 	}
 
 	return nil
-}
-
-func (r *Registry) Namespace() string {
-	return r.namespace
 }
 
 func (r *Registry) Histogram(name string) (*prometheus.HistogramVec, error) {

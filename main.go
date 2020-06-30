@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/chaseisabelle/phprom/handler"
-	"github.com/chaseisabelle/phprom/registry"
 	"github.com/chaseisabelle/phprom/server"
 )
 
@@ -13,13 +11,13 @@ func main() {
 
 	flag.Parse()
 
-	reg, err := registry.New(*namespace)
+	reg, err := server.New(*namespace)
 
 	if err != nil {
 		panic(err)
 	}
 
-	han := handler.New(reg)
+	han := server.New(reg)
 	srv := server.New(*host, han)
 
 	go func() {

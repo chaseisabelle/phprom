@@ -3,65 +3,50 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/chaseisabelle/phprom/handler"
+	"github.com/chaseisabelle/goresp"
+	"github.com/chaseisabelle/phprom/command"
 	"github.com/chaseisabelle/resptcp"
-	"github.com/tidwall/resp"
 )
 
 type Server resptcp.Server
 
-func New(host string, handler *handler.Handler) *Server {
-	return (*Server)(resptcp.New(host, func(value resp.Value, err error) (resp.Value, error) {
+func New(host string) *Server {
+	return (*Server)(resptcp.New(host, func(values []goresp.Value, err error) ([]goresp.Value, error) {
 		if err != nil {
-			return resp.ErrorValue(err), nil
+			return []goresp.Value{goresp.NewError(err)}, nil
 		}
 
-		commands := value.Array()
+		if len(values) < 0 {
+			err := errors.New("no command specified")
 
-		if value.Type() != resp.Array {
-			err = fmt.Errorf("invalid command array %+v", value)
+			return []goresp.Value{goresp.NewError(err)}, nil
 		}
 
-		if err == nil && len(commands) == 0 {
-			err = errors.New("empty command array")
+		bs, err := values[0].Bytes()
+
+		if err == nil && len(bs) != 1 {
+			err = fmt.Errorf("malformed command: %s", string(bs))
 		}
 
 		if err != nil {
-			return resp.ErrorValue(err), nil
+			return []goresp.Value{goresp.NewError(err)}, nil
 		}
 
-		for i, command := range commands {
-			switch command.Type() {
-			case resp.SimpleString:
-			case resp.Array:
-				break
-			default:
-				return resp.ErrorValue(fmt.Errorf("invalid command %+v at %d", command, i)), nil
-			}
-		}
+		var c command.Command
 
-		command := commands[0]
+		switch bs[0] {
+		case 'R':
+		case 'M':
 
-		if command.Type() != resp.SimpleString {
-			return resp.ErrorValue(fmt.Errorf("invalid main command %+v", command)), nil
-		}
-
-		toBytes := []byte(command.String())
-
-		if len(toBytes) == 0 {
-
-		}
-
-		switch len(toBytes) {
-		case 0:
-			return resp.ErrorValue(errors.New("empty main command")), nil
-		case 1:
 		default:
-			return resp.ErrorValue(errors.New("excessive main command")), nil
+			err = fmt.Errorf("invalid command: %s", string(bs))
 		}
 
-		return handler.Handle(toBytes[0], commands[1:]), nil
-	}))
+		if err != nil {
+			return []goresp.Value{goresp.NewError(err)}, nil
+		}
+
+	}, '\000'))
 }
 
 func (s *Server) Serve() error {
