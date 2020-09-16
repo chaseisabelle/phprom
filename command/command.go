@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/chaseisabelle/goresp"
 	"github.com/chaseisabelle/phprom/environment"
-	"github.com/chaseisabelle/phprom/registry"
-	"github.com/chaseisabelle/phprom/types"
-	"github.com/tidwall/resp"
-	"time"
+)
+
+const (
+	METRICS  = 'M'
+	REGISTER = 'R'
+	RECORD   = 'C'
+	CLOSE    = 'X'
 )
 
 type Command interface {
@@ -24,18 +27,45 @@ func NewCommand(e *environment.Environment, id byte) (Command, error) {
 		cmd = NewRegister(e)
 	case METRICS:
 		cmd = NewMetrics(e)
+	case RECORD:
+		cmd = NewRecord(e)
+	case CLOSE:
+		cmd = NewClose(e)
 	default:
-		err = fmt.Errorf("invalid command: %s", string(bs))
+		err = fmt.Errorf("invalid command: %s", string(id))
 	}
 
 	return cmd, err
 }
 
-const (
-	METRICS   byte = 'M'
-	REGISTER  byte = 'R'
-	HISTOGRAM      = types.Histogram
-	COUNTER        = types.Counter
-	SUMMARY        = types.Summary
-	GAUGE          = types.Gauge
-)
+func mapLabels(vals []goresp.Value) (map[string]string, error) {
+	labs := make(map[string]string)
+
+	for _, val := range vals {
+		tup, err := val.Array()
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(tup) != 2 {
+			return nil, errors.New("invalid tuple")
+		}
+
+		key, err := tup[0].String()
+
+		if err != nil {
+			return nil, err
+		}
+
+		lab, err := tup[1].String()
+
+		if err != nil {
+			return nil, err
+		}
+
+		labs[key] = lab
+	}
+
+	return labs, nil
+}

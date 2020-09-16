@@ -2,47 +2,28 @@ package main
 
 import (
 	"flag"
+	"github.com/chaseisabelle/phprom/configuration"
+	"github.com/chaseisabelle/phprom/environment"
 	"github.com/chaseisabelle/phprom/server"
 )
 
 func main() {
-	host := flag.String("host", ":3333", "host and port to listen on")
-	namespace := flag.String("namespace", "", "the metric namespace")
+	file := flag.String("config", "config.yml", "the config file path")
 
 	flag.Parse()
 
-	reg, err := server.New(*namespace)
+	cfg, err := configuration.New(*file)
 
 	if err != nil {
 		panic(err)
 	}
 
-	han := server.New(reg)
-	srv := server.New(*host, han)
-
-	go func() {
-		for err := range srv.Errors {
-			printerr(err)
-		}
-	}()
+	env := environment.New(cfg)
+	srv := server.New(env)
 
 	err = srv.Serve()
 
 	if err != nil {
 		panic(err)
 	}
-}
-
-func printerr(err error) {
-	println(err.Error())
-}
-
-func keys(labs map[string]string) []string {
-	keys := make([]string, 0)
-
-	for key := range labs {
-		keys = append(keys, key)
-	}
-
-	return keys
 }

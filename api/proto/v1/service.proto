@@ -1,0 +1,90 @@
+syntax = "proto3";
+package v1;
+
+message GetRequest {
+  string namespace = 1;
+}
+
+message GetResponse {
+  string metrics = 1;
+}
+
+message RegisterCounterRequest {
+  string namespace = 1;
+  string name = 2;
+  string description = 3;
+  repeated string labels = 4;
+}
+
+message RegisterHistogramRequest {
+  string namespace = 1;
+  string name = 2;
+  string description = 3;
+  repeated string labels = 4;
+  repeated float buckets = 5;
+}
+
+message RegisterSummaryRequest {
+  string namespace = 1;
+  string name = 2;
+  string description = 3;
+  repeated string labels = 4;
+}
+
+message RegisterGaugeRequest {
+  string namespace = 1;
+  string name = 2;
+  string description = 3;
+  repeated string labels = 4;
+}
+
+message RegisterResponse {
+  string api = 1;
+  bool registered = 2;
+  string error = 3;
+}
+
+message RecordCounterRequest {
+  string namespace = 1;
+  string name = 2;
+  float value = 3;
+  map<string, string> labels = 4;
+}
+
+message RecordHistogramRequest {
+  string namespace = 1;
+  string name = 2;
+  float value = 3;
+  map<string, string> labels = 4;
+}
+
+message RecordSummaryRequest {
+  string namespace = 1;
+  string name = 2;
+  float value = 3;
+  map<string, string> labels = 4;
+}
+
+message RecordGaugeRequest {
+  string namespace = 1;
+  string name = 2;
+  float value = 3;
+  map<string, string> labels = 4;
+}
+
+message RecordResponse {
+  string api = 1;
+  string error = 2;
+}
+
+service Service {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc RegisterCounter(RegisterCounterRequest) returns (RegisterResponse);
+  rpc RegisterHistogram(RegisterHistogramRequest) returns (RegisterResponse);
+  rpc RegisterSummary(RegisterSummaryRequest) returns (RegisterResponse);
+  rpc RegisterGauge(RegisterGaugeRequest) returns (RegisterResponse);
+  rpc RecordCounter(RecordCounterRequest) returns (RecordResponse);
+  rpc RecordHistogram(RecordHistogramRequest) returns (RecordResponse);
+  rpc RecordSummary(RecordSummaryRequest) returns (RecordResponse);
+  rpc RecordGauge(RecordGaugeRequest) returns (RecordResponse);
+}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/chaseisabelle/goresp"
 	"github.com/chaseisabelle/phprom/environment"
+	"github.com/chaseisabelle/phprom/metrics"
 )
 
 type Metrics struct {
@@ -23,13 +24,7 @@ func (m *Metrics) Execute(args ...goresp.Value) ([]goresp.Value, error) {
 		return []goresp.Value{goresp.NewError(err)}, err
 	}
 
-	reg, err := m.env.Registry()
-
-	if err != nil {
-		return []goresp.Value{goresp.NewError(err)}, err
-	}
-
-	met, err := reg.Metrics()
+	met, err := metrics.Metrics()
 
 	if err != nil {
 		return []goresp.Value{goresp.NewError(err)}, err

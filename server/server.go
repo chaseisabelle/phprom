@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/chaseisabelle/goresp"
 	"github.com/chaseisabelle/phprom/command"
+	"github.com/chaseisabelle/phprom/environment"
 	"github.com/chaseisabelle/resptcp"
 )
 
 type Server resptcp.Server
 
-func New(host string) *Server {
-	return (*Server)(resptcp.New(host, func(values []goresp.Value, err error) ([]goresp.Value, error) {
+func New(env *environment.Environment) *Server {
+	return (*Server)(resptcp.New(env.Host(), func(values []goresp.Value, err error) ([]goresp.Value, error) {
 		if err != nil {
 			return []goresp.Value{goresp.NewError(err)}, nil
 		}
@@ -32,25 +33,24 @@ func New(host string) *Server {
 			return []goresp.Value{goresp.NewError(err)}, nil
 		}
 
-		var c command.Command
-
-		switch bs[0] {
-		case 'R':
-		case 'M':
-
-		default:
-			err = fmt.Errorf("invalid command: %s", string(bs))
-		}
+		cmd, err := command.NewCommand(env, bs[0])
 
 		if err != nil {
 			return []goresp.Value{goresp.NewError(err)}, nil
 		}
 
+		return cmd.Execute(values[1:]...)
 	}, '\000'))
 }
 
 func (s *Server) Serve() error {
 	server := resptcp.Server(*s)
+
+	go func() {
+		for err := range server.Errors {
+			println(err.Error())
+		}
+	}()
 
 	return server.Start()
 }

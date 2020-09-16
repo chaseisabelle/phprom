@@ -2,14 +2,12 @@ package environment
 
 import (
 	"github.com/chaseisabelle/phprom/configuration"
-	"github.com/chaseisabelle/phprom/registry"
-	"github.com/chaseisabelle/phprom/server"
+	"sync"
 )
 
 type Environment struct {
-	config   *configuration.Configuration
-	registry *registry.Registry
-	server   *server.Server
+	sync.Mutex
+	config *configuration.Configuration
 }
 
 func New(cfg *configuration.Configuration) *Environment {
@@ -18,24 +16,10 @@ func New(cfg *configuration.Configuration) *Environment {
 	}
 }
 
-func (e *Environment) Registry() (*registry.Registry, error) {
-	if e.registry == nil {
-		reg, err := registry.New()
+func (e *Environment) Host() string {
+	e.Lock()
 
-		if err != nil {
-			return nil, err
-		}
+	defer e.Unlock()
 
-		e.registry = reg
-	}
-
-	return e.registry, nil
-}
-
-func (e *Environment) Server() *server.Server {
-	if e.server == nil {
-		e.server = server.New(e.config.Host)
-	}
-
-	return e.server
+	return e.config.Host
 }
