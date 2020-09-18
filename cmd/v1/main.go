@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"github.com/chaseisabelle/phprom/src/v1"
 	"github.com/chaseisabelle/stop"
 	"google.golang.org/grpc"
@@ -28,7 +29,7 @@ func main() {
 
 	srv := grpc.NewServer()
 
-	v1.RegisterServiceServer(srv, ins)
+	phprom_v1.RegisterServiceServer(srv, ins)
 
 	log.Println("starting server...")
 

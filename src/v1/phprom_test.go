@@ -1,7 +1,7 @@
 package v1
 
 import (
-	phprom_v1 "github.com/chaseisabelle/phprom/api/go/v1"
+	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"strings"
 	"sync"
 	"testing"

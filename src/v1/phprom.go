@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	phprom_v1 "github.com/chaseisabelle/phprom/api/go/v1"
+	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
 )

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package phprom.v1;
+package PHProm.v1;
 
 message GetRequest {
 }
