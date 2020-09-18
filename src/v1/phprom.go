@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	phprom_v1 "github.com/chaseisabelle/phprom/api/go/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
 )
@@ -26,7 +27,7 @@ func New() (*PHProm, error) {
 	return &PHProm{}, nil
 }
 
-func (p *PHProm) Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
+func (p *PHProm) Get(ctx context.Context, req *phprom_v1.GetRequest) (*phprom_v1.GetResponse, error) {
 	mfs, err := prometheus.Gatherers{
 		prometheus.DefaultGatherer,
 	}.Gather()
@@ -45,12 +46,12 @@ func (p *PHProm) Get(ctx context.Context, req *GetRequest) (*GetResponse, error)
 		}
 	}
 
-	return &GetResponse{
+	return &phprom_v1.GetResponse{
 		Metrics: out.String(),
 	}, nil
 }
 
-func (p *PHProm) RegisterCounter(ctx context.Context, req *RegisterCounterRequest) (*RegisterResponse, error) {
+func (p *PHProm) RegisterCounter(ctx context.Context, req *phprom_v1.RegisterCounterRequest) (*phprom_v1.RegisterResponse, error) {
 	col := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: req.Namespace,
 		Name:      req.Name,
@@ -66,7 +67,7 @@ func (p *PHProm) RegisterCounter(ctx context.Context, req *RegisterCounterReques
 	return res, err
 }
 
-func (p *PHProm) RegisterHistogram(ctx context.Context, req *RegisterHistogramRequest) (*RegisterResponse, error) {
+func (p *PHProm) RegisterHistogram(ctx context.Context, req *phprom_v1.RegisterHistogramRequest) (*phprom_v1.RegisterResponse, error) {
 	bux := make([]float64, len(req.Buckets))
 
 	for i, b := range req.Buckets {
@@ -89,7 +90,7 @@ func (p *PHProm) RegisterHistogram(ctx context.Context, req *RegisterHistogramRe
 	return res, err
 }
 
-func (p *PHProm) RegisterSummary(ctx context.Context, req *RegisterSummaryRequest) (*RegisterResponse, error) {
+func (p *PHProm) RegisterSummary(ctx context.Context, req *phprom_v1.RegisterSummaryRequest) (*phprom_v1.RegisterResponse, error) {
 	col := prometheus.NewSummaryVec(prometheus.SummaryOpts{
 		Namespace: req.Namespace,
 		Name:      req.Name,
@@ -105,7 +106,7 @@ func (p *PHProm) RegisterSummary(ctx context.Context, req *RegisterSummaryReques
 	return res, err
 }
 
-func (p *PHProm) RegisterGauge(ctx context.Context, req *RegisterGaugeRequest) (*RegisterResponse, error) {
+func (p *PHProm) RegisterGauge(ctx context.Context, req *phprom_v1.RegisterGaugeRequest) (*phprom_v1.RegisterResponse, error) {
 	col := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: req.Namespace,
 		Name:      req.Name,
@@ -121,7 +122,7 @@ func (p *PHProm) RegisterGauge(ctx context.Context, req *RegisterGaugeRequest) (
 	return res, err
 }
 
-func (p *PHProm) RecordCounter(ctx context.Context, req *RecordCounterRequest) (*RecordResponse, error) {
+func (p *PHProm) RecordCounter(ctx context.Context, req *phprom_v1.RecordCounterRequest) (*phprom_v1.RecordResponse, error) {
 	col, ok := counters[key(req.Namespace, req.Name)]
 
 	if !ok {
@@ -130,10 +131,10 @@ func (p *PHProm) RecordCounter(ctx context.Context, req *RecordCounterRequest) (
 
 	col.With(req.Labels).Add(float64(req.Value))
 
-	return &RecordResponse{}, nil
+	return &phprom_v1.RecordResponse{}, nil
 }
 
-func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramRequest) (*RecordResponse, error) {
+func (p *PHProm) RecordHistogram(ctx context.Context, req *phprom_v1.RecordHistogramRequest) (*phprom_v1.RecordResponse, error) {
 	col, ok := histograms[key(req.Namespace, req.Name)]
 
 	if !ok {
@@ -142,10 +143,10 @@ func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramReques
 
 	col.With(req.Labels).Observe(float64(req.Value))
 
-	return &RecordResponse{}, nil
+	return &phprom_v1.RecordResponse{}, nil
 }
 
-func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (*RecordResponse, error) {
+func (p *PHProm) RecordSummary(ctx context.Context, req *phprom_v1.RecordSummaryRequest) (*phprom_v1.RecordResponse, error) {
 	col, ok := summaries[key(req.Namespace, req.Name)]
 
 	if !ok {
@@ -154,10 +155,10 @@ func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (
 
 	col.With(req.Labels).Observe(float64(req.Value))
 
-	return &RecordResponse{}, nil
+	return &phprom_v1.RecordResponse{}, nil
 }
 
-func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*RecordResponse, error) {
+func (p *PHProm) RecordGauge(ctx context.Context, req *phprom_v1.RecordGaugeRequest) (*phprom_v1.RecordResponse, error) {
 	col, ok := gauges[key(req.Namespace, req.Name)]
 
 	if !ok {
@@ -166,14 +167,14 @@ func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*Rec
 
 	col.With(req.Labels).Add(float64(req.Value))
 
-	return &RecordResponse{}, nil
+	return &phprom_v1.RecordResponse{}, nil
 }
 
 func key(ns string, n string) string {
 	return fmt.Sprintf("%s_%s", ns, n)
 }
 
-func register(c prometheus.Collector) (*RegisterResponse, error) {
+func register(c prometheus.Collector) (*phprom_v1.RegisterResponse, error) {
 	err := prometheus.DefaultRegisterer.Register(c)
 
 	_, ok := err.(prometheus.AlreadyRegisteredError)
@@ -182,7 +183,7 @@ func register(c prometheus.Collector) (*RegisterResponse, error) {
 		err = nil
 	}
 
-	return &RegisterResponse{
+	return &phprom_v1.RegisterResponse{
 		Registered: ok,
 	}, err
 }

@@ -32,6 +32,6 @@ generate-server:
         ${PROTO_DIR}/service.proto
 
 update-server: generate-server
-	cp ${GO_OUT}/service.pb.go src/v1/
+	cp ${GO_OUT}/service.pb.go pkg/v1/
 
 update-client: generate-client

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	phprom_v1 "github.com/chaseisabelle/phprom/api/go/v1"
 	"strings"
 	"sync"
 	"testing"
@@ -38,7 +39,7 @@ func Test_Counter_Success(t *testing.T) {
 		t.Errorf("bad record counter response: %+v", err)
 	}
 
-	res3, err := srv.Get(nil, &GetRequest{})
+	res3, err := srv.Get(nil, &phprom_v1.GetRequest{})
 
 	if err != nil {
 		t.Errorf("failed to get counter metrics: %+v", err)
@@ -85,7 +86,7 @@ func Test_Histogram_Success(t *testing.T) {
 		t.Errorf("bad record histogram response: %+v", err)
 	}
 
-	res3, err := srv.Get(nil, &GetRequest{})
+	res3, err := srv.Get(nil, &phprom_v1.GetRequest{})
 
 	if err != nil {
 		t.Errorf("failed to get histogram metrics: %+v", err)
@@ -145,7 +146,7 @@ func Test_Summary_Success(t *testing.T) {
 		t.Errorf("bad record summary response: %+v", err)
 	}
 
-	res3, err := srv.Get(nil, &GetRequest{})
+	res3, err := srv.Get(nil, &phprom_v1.GetRequest{})
 
 	if err != nil {
 		t.Errorf("failed to get summary metrics: %+v", err)
@@ -193,7 +194,7 @@ func Test_Gauge_Success(t *testing.T) {
 		t.Errorf("bad record gauge response: %+v", err)
 	}
 
-	res3, err := srv.Get(nil, &GetRequest{})
+	res3, err := srv.Get(nil, &phprom_v1.GetRequest{})
 
 	if err != nil {
 		t.Errorf("failed to get gauge metrics: %+v", err)
@@ -401,8 +402,8 @@ func Test_Race_Success(t *testing.T) {
 
 // helpers
 
-func regCounter(s *PHProm, ns string, n string, d string, l []string) (*RegisterResponse, error) {
-	return s.RegisterCounter(nil, &RegisterCounterRequest{
+func regCounter(s *PHProm, ns string, n string, d string, l []string) (*phprom_v1.RegisterResponse, error) {
+	return s.RegisterCounter(nil, &phprom_v1.RegisterCounterRequest{
 		Namespace:   ns,
 		Name:        n,
 		Description: d,
@@ -410,8 +411,8 @@ func regCounter(s *PHProm, ns string, n string, d string, l []string) (*Register
 	})
 }
 
-func recCounter(s *PHProm, ns string, n string, l map[string]string, v float32) (*RecordResponse, error) {
-	return s.RecordCounter(nil, &RecordCounterRequest{
+func recCounter(s *PHProm, ns string, n string, l map[string]string, v float32) (*phprom_v1.RecordResponse, error) {
+	return s.RecordCounter(nil, &phprom_v1.RecordCounterRequest{
 		Namespace: ns,
 		Name:      n,
 		Labels:    l,
@@ -419,8 +420,8 @@ func recCounter(s *PHProm, ns string, n string, l map[string]string, v float32) 
 	})
 }
 
-func regHisto(s *PHProm, ns string, n string, d string, l []string) (*RegisterResponse, error) {
-	return s.RegisterHistogram(nil, &RegisterHistogramRequest{
+func regHisto(s *PHProm, ns string, n string, d string, l []string) (*phprom_v1.RegisterResponse, error) {
+	return s.RegisterHistogram(nil, &phprom_v1.RegisterHistogramRequest{
 		Namespace:   ns,
 		Name:        n,
 		Description: d,
@@ -428,8 +429,8 @@ func regHisto(s *PHProm, ns string, n string, d string, l []string) (*RegisterRe
 	})
 }
 
-func recHisto(s *PHProm, ns string, n string, l map[string]string, v float32) (*RecordResponse, error) {
-	return s.RecordHistogram(nil, &RecordHistogramRequest{
+func recHisto(s *PHProm, ns string, n string, l map[string]string, v float32) (*phprom_v1.RecordResponse, error) {
+	return s.RecordHistogram(nil, &phprom_v1.RecordHistogramRequest{
 		Namespace: ns,
 		Name:      n,
 		Labels:    l,
@@ -437,8 +438,8 @@ func recHisto(s *PHProm, ns string, n string, l map[string]string, v float32) (*
 	})
 }
 
-func regSumm(s *PHProm, ns string, n string, d string, l []string) (*RegisterResponse, error) {
-	return s.RegisterSummary(nil, &RegisterSummaryRequest{
+func regSumm(s *PHProm, ns string, n string, d string, l []string) (*phprom_v1.RegisterResponse, error) {
+	return s.RegisterSummary(nil, &phprom_v1.RegisterSummaryRequest{
 		Namespace:   ns,
 		Name:        n,
 		Description: d,
@@ -446,8 +447,8 @@ func regSumm(s *PHProm, ns string, n string, d string, l []string) (*RegisterRes
 	})
 }
 
-func recSumm(s *PHProm, ns string, n string, l map[string]string, v float32) (*RecordResponse, error) {
-	return s.RecordSummary(nil, &RecordSummaryRequest{
+func recSumm(s *PHProm, ns string, n string, l map[string]string, v float32) (*phprom_v1.RecordResponse, error) {
+	return s.RecordSummary(nil, &phprom_v1.RecordSummaryRequest{
 		Namespace: ns,
 		Name:      n,
 		Labels:    l,
@@ -455,8 +456,8 @@ func recSumm(s *PHProm, ns string, n string, l map[string]string, v float32) (*R
 	})
 }
 
-func regGauge(s *PHProm, ns string, n string, d string, l []string) (*RegisterResponse, error) {
-	return s.RegisterGauge(nil, &RegisterGaugeRequest{
+func regGauge(s *PHProm, ns string, n string, d string, l []string) (*phprom_v1.RegisterResponse, error) {
+	return s.RegisterGauge(nil, &phprom_v1.RegisterGaugeRequest{
 		Namespace:   ns,
 		Name:        n,
 		Description: d,
@@ -464,8 +465,8 @@ func regGauge(s *PHProm, ns string, n string, d string, l []string) (*RegisterRe
 	})
 }
 
-func recGauge(s *PHProm, ns string, n string, l map[string]string, v float32) (*RecordResponse, error) {
-	return s.RecordGauge(nil, &RecordGaugeRequest{
+func recGauge(s *PHProm, ns string, n string, l map[string]string, v float32) (*phprom_v1.RecordResponse, error) {
+	return s.RecordGauge(nil, &phprom_v1.RecordGaugeRequest{
 		Namespace: ns,
 		Name:      n,
 		Labels:    l,

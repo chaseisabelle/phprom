@@ -38,7 +38,7 @@ message RegisterGaugeRequest {
 }
 
 message RegisterResponse {
-  bool registered = 2;
+  bool registered = 1;
 }
 
 message RecordCounterRequest {
