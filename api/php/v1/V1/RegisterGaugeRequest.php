@@ -14,15 +14,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     */
+    private $namespace = '';
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      */
     private $name = '';
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      */
     private $description = '';
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      */
     private $labels;
 
@@ -32,6 +36,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $namespace
      *     @type string $name
      *     @type string $description
      *     @type string[]|\Google\Protobuf\Internal\RepeatedField $labels
@@ -43,7 +48,29 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setNamespace($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->namespace = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      * @return string
      */
     public function getName()
@@ -52,7 +79,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 2;</code>
      * @param string $var
      * @return $this
      */
@@ -65,7 +92,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      * @return string
      */
     public function getDescription()
@@ -74,7 +101,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      * @param string $var
      * @return $this
      */
@@ -87,7 +114,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getLabels()
@@ -96,7 +123,7 @@ class RegisterGaugeRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */

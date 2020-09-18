@@ -33,3 +33,5 @@ generate-server:
 
 update-server: generate-server
 	cp ${GO_OUT}/service.pb.go src/v1/
+
+update-client: generate-client

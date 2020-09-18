@@ -21,10 +21,6 @@ class RegisterResponse extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>bool registered = 2;</code>
      */
     private $registered = false;
-    /**
-     * Generated from protobuf field <code>string error = 3;</code>
-     */
-    private $error = '';
 
     /**
      * Constructor.
@@ -34,7 +30,6 @@ class RegisterResponse extends \Google\Protobuf\Internal\Message
      *
      *     @type string $api
      *     @type bool $registered
-     *     @type string $error
      * }
      */
     public function __construct($data = NULL) {
@@ -82,28 +77,6 @@ class RegisterResponse extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkBool($var);
         $this->registered = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>string error = 3;</code>
-     * @return string
-     */
-    public function getError()
-    {
-        return $this->error;
-    }
-
-    /**
-     * Generated from protobuf field <code>string error = 3;</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setError($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->error = $var;
 
         return $this;
     }

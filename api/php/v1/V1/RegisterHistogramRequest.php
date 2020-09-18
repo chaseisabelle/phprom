@@ -14,19 +14,23 @@ use Google\Protobuf\Internal\GPBUtil;
 class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     */
+    private $namespace = '';
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      */
     private $name = '';
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      */
     private $description = '';
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      */
     private $labels;
     /**
-     * Generated from protobuf field <code>repeated int32 buckets = 4;</code>
+     * Generated from protobuf field <code>repeated float buckets = 5;</code>
      */
     private $buckets;
 
@@ -36,10 +40,11 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $namespace
      *     @type string $name
      *     @type string $description
      *     @type string[]|\Google\Protobuf\Internal\RepeatedField $labels
-     *     @type int[]|\Google\Protobuf\Internal\RepeatedField $buckets
+     *     @type float[]|\Google\Protobuf\Internal\RepeatedField $buckets
      * }
      */
     public function __construct($data = NULL) {
@@ -48,7 +53,29 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setNamespace($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->namespace = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      * @return string
      */
     public function getName()
@@ -57,7 +84,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 2;</code>
      * @param string $var
      * @return $this
      */
@@ -70,7 +97,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      * @return string
      */
     public function getDescription()
@@ -79,7 +106,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string description = 2;</code>
+     * Generated from protobuf field <code>string description = 3;</code>
      * @param string $var
      * @return $this
      */
@@ -92,7 +119,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getLabels()
@@ -101,7 +128,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>repeated string labels = 4;</code>
      * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
@@ -114,7 +141,7 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated int32 buckets = 4;</code>
+     * Generated from protobuf field <code>repeated float buckets = 5;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getBuckets()
@@ -123,13 +150,13 @@ class RegisterHistogramRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated int32 buckets = 4;</code>
-     * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>repeated float buckets = 5;</code>
+     * @param float[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setBuckets($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::INT32);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::FLOAT);
         $this->buckets = $arr;
 
         return $this;

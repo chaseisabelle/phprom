@@ -27,7 +27,7 @@ func New() (*PHProm, error) {
 }
 
 func (p *PHProm) Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
-	gat, err := prometheus.Gatherers{
+	mfs, err := prometheus.Gatherers{
 		prometheus.DefaultGatherer,
 	}.Gather()
 
@@ -37,7 +37,7 @@ func (p *PHProm) Get(ctx context.Context, req *GetRequest) (*GetResponse, error)
 
 	out := &bytes.Buffer{}
 
-	for _, fam := range gat {
+	for _, fam := range mfs {
 		_, err := expfmt.MetricFamilyToText(out, fam)
 
 		if err != nil {
@@ -52,14 +52,15 @@ func (p *PHProm) Get(ctx context.Context, req *GetRequest) (*GetResponse, error)
 
 func (p *PHProm) RegisterCounter(ctx context.Context, req *RegisterCounterRequest) (*RegisterResponse, error) {
 	col := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: req.Name,
-		Help: req.Description,
+		Namespace: req.Namespace,
+		Name:      req.Name,
+		Help:      req.Description,
 	}, req.Labels)
 
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		counters[req.Name] = col
+		counters[key(req.Namespace, req.Name)] = col
 	}
 
 	return res, err
@@ -73,15 +74,16 @@ func (p *PHProm) RegisterHistogram(ctx context.Context, req *RegisterHistogramRe
 	}
 
 	col := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    req.Name,
-		Help:    req.Description,
-		Buckets: bux,
+		Namespace: req.Namespace,
+		Name:      req.Name,
+		Help:      req.Description,
+		Buckets:   bux,
 	}, req.Labels)
 
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		histograms[req.Name] = col
+		histograms[key(req.Namespace, req.Name)] = col
 	}
 
 	return res, err
@@ -89,14 +91,15 @@ func (p *PHProm) RegisterHistogram(ctx context.Context, req *RegisterHistogramRe
 
 func (p *PHProm) RegisterSummary(ctx context.Context, req *RegisterSummaryRequest) (*RegisterResponse, error) {
 	col := prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name: req.Name,
-		Help: req.Description,
+		Namespace: req.Namespace,
+		Name:      req.Name,
+		Help:      req.Description,
 	}, req.Labels)
 
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		summaries[req.Name] = col
+		summaries[key(req.Namespace, req.Name)] = col
 	}
 
 	return res, err
@@ -104,21 +107,22 @@ func (p *PHProm) RegisterSummary(ctx context.Context, req *RegisterSummaryReques
 
 func (p *PHProm) RegisterGauge(ctx context.Context, req *RegisterGaugeRequest) (*RegisterResponse, error) {
 	col := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: req.Name,
-		Help: req.Description,
+		Namespace: req.Namespace,
+		Name:      req.Name,
+		Help:      req.Description,
 	}, req.Labels)
 
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		gauges[req.Name] = col
+		gauges[key(req.Namespace, req.Name)] = col
 	}
 
 	return res, err
 }
 
 func (p *PHProm) RecordCounter(ctx context.Context, req *RecordCounterRequest) (*RecordResponse, error) {
-	col, ok := counters[req.Name]
+	col, ok := counters[key(req.Namespace, req.Name)]
 
 	if !ok {
 		return nil, fmt.Errorf("no counter registered as %s", req.Name)
@@ -132,7 +136,7 @@ func (p *PHProm) RecordCounter(ctx context.Context, req *RecordCounterRequest) (
 }
 
 func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramRequest) (*RecordResponse, error) {
-	col, ok := histograms[req.Name]
+	col, ok := histograms[key(req.Namespace, req.Name)]
 
 	if !ok {
 		return nil, fmt.Errorf("no histogram registered as %s", req.Name)
@@ -146,7 +150,7 @@ func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramReques
 }
 
 func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (*RecordResponse, error) {
-	col, ok := summaries[req.Name]
+	col, ok := summaries[key(req.Namespace, req.Name)]
 
 	if !ok {
 		return nil, fmt.Errorf("no summary registered as %s", req.Name)
@@ -160,7 +164,7 @@ func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (
 }
 
 func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*RecordResponse, error) {
-	col, ok := gauges[req.Name]
+	col, ok := gauges[key(req.Namespace, req.Name)]
 
 	if !ok {
 		return nil, fmt.Errorf("no gauge registered as %s", req.Name)
@@ -171,6 +175,10 @@ func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*Rec
 	return &RecordResponse{
 		Api: "1",
 	}, nil
+}
+
+func key(ns string, n string) string {
+	return fmt.Sprintf("%s_%s", ns, n)
 }
 
 func register(c prometheus.Collector) (*RegisterResponse, error) {

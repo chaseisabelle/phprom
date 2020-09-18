@@ -2,7 +2,6 @@ syntax = "proto3";
 package v1;
 
 message GetRequest {
-  string namespace = 1;
 }
 
 message GetResponse {
@@ -41,7 +40,6 @@ message RegisterGaugeRequest {
 message RegisterResponse {
   string api = 1;
   bool registered = 2;
-  string error = 3;
 }
 
 message RecordCounterRequest {
@@ -74,7 +72,6 @@ message RecordGaugeRequest {
 
 message RecordResponse {
   string api = 1;
-  string error = 2;
 }
 
 service Service {

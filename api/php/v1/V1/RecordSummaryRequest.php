@@ -14,15 +14,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     */
+    private $namespace = '';
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      */
     private $name = '';
     /**
-     * Generated from protobuf field <code>int64 value = 2;</code>
+     * Generated from protobuf field <code>float value = 3;</code>
      */
-    private $value = 0;
+    private $value = 0.0;
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
+     * Generated from protobuf field <code>map<string, string> labels = 4;</code>
      */
     private $labels;
 
@@ -32,9 +36,10 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type string $namespace
      *     @type string $name
-     *     @type int|string $value
-     *     @type string[]|\Google\Protobuf\Internal\RepeatedField $labels
+     *     @type float $value
+     *     @type array|\Google\Protobuf\Internal\MapField $labels
      * }
      */
     public function __construct($data = NULL) {
@@ -43,7 +48,29 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Generated from protobuf field <code>string namespace = 1;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setNamespace($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->namespace = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string name = 2;</code>
      * @return string
      */
     public function getName()
@@ -52,7 +79,7 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string name = 1;</code>
+     * Generated from protobuf field <code>string name = 2;</code>
      * @param string $var
      * @return $this
      */
@@ -65,8 +92,8 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 value = 2;</code>
-     * @return int|string
+     * Generated from protobuf field <code>float value = 3;</code>
+     * @return float
      */
     public function getValue()
     {
@@ -74,21 +101,21 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 value = 2;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>float value = 3;</code>
+     * @param float $var
      * @return $this
      */
     public function setValue($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkFloat($var);
         $this->value = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
-     * @return \Google\Protobuf\Internal\RepeatedField
+     * Generated from protobuf field <code>map<string, string> labels = 4;</code>
+     * @return \Google\Protobuf\Internal\MapField
      */
     public function getLabels()
     {
@@ -96,13 +123,13 @@ class RecordSummaryRequest extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>repeated string labels = 3;</code>
-     * @param string[]|\Google\Protobuf\Internal\RepeatedField $var
+     * Generated from protobuf field <code>map<string, string> labels = 4;</code>
+     * @param array|\Google\Protobuf\Internal\MapField $var
      * @return $this
      */
     public function setLabels($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::STRING);
+        $arr = GPBUtil::checkMapField($var, \Google\Protobuf\Internal\GPBType::STRING, \Google\Protobuf\Internal\GPBType::STRING);
         $this->labels = $arr;
 
         return $this;

@@ -9,14 +9,14 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Generated from protobuf message <code>v1.RecordResponse</code>
+ * Generated from protobuf message <code>v1.GetResponse</code>
  */
-class RecordResponse extends \Google\Protobuf\Internal\Message
+class GetResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string api = 1;</code>
+     * Generated from protobuf field <code>string metrics = 1;</code>
      */
-    private $api = '';
+    private $metrics = '';
 
     /**
      * Constructor.
@@ -24,7 +24,7 @@ class RecordResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string $api
+     *     @type string $metrics
      * }
      */
     public function __construct($data = NULL) {
@@ -33,23 +33,23 @@ class RecordResponse extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string api = 1;</code>
+     * Generated from protobuf field <code>string metrics = 1;</code>
      * @return string
      */
-    public function getApi()
+    public function getMetrics()
     {
-        return $this->api;
+        return $this->metrics;
     }
 
     /**
-     * Generated from protobuf field <code>string api = 1;</code>
+     * Generated from protobuf field <code>string metrics = 1;</code>
      * @param string $var
      * @return $this
      */
-    public function setApi($var)
+    public function setMetrics($var)
     {
         GPBUtil::checkString($var, True);
-        $this->api = $var;
+        $this->metrics = $var;
 
         return $this;
     }
