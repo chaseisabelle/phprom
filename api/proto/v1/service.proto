@@ -38,7 +38,6 @@ message RegisterGaugeRequest {
 }
 
 message RegisterResponse {
-  string api = 1;
   bool registered = 2;
 }
 
@@ -71,7 +70,6 @@ message RecordGaugeRequest {
 }
 
 message RecordResponse {
-  string api = 1;
 }
 
 service Service {

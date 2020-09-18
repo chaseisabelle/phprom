@@ -130,9 +130,7 @@ func (p *PHProm) RecordCounter(ctx context.Context, req *RecordCounterRequest) (
 
 	col.With(req.Labels).Add(float64(req.Value))
 
-	return &RecordResponse{
-		Api: "1",
-	}, nil
+	return &RecordResponse{}, nil
 }
 
 func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramRequest) (*RecordResponse, error) {
@@ -144,9 +142,7 @@ func (p *PHProm) RecordHistogram(ctx context.Context, req *RecordHistogramReques
 
 	col.With(req.Labels).Observe(float64(req.Value))
 
-	return &RecordResponse{
-		Api: "1",
-	}, nil
+	return &RecordResponse{}, nil
 }
 
 func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (*RecordResponse, error) {
@@ -158,9 +154,7 @@ func (p *PHProm) RecordSummary(ctx context.Context, req *RecordSummaryRequest) (
 
 	col.With(req.Labels).Observe(float64(req.Value))
 
-	return &RecordResponse{
-		Api: "1",
-	}, nil
+	return &RecordResponse{}, nil
 }
 
 func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*RecordResponse, error) {
@@ -172,9 +166,7 @@ func (p *PHProm) RecordGauge(ctx context.Context, req *RecordGaugeRequest) (*Rec
 
 	col.With(req.Labels).Add(float64(req.Value))
 
-	return &RecordResponse{
-		Api: "1",
-	}, nil
+	return &RecordResponse{}, nil
 }
 
 func key(ns string, n string) string {
@@ -191,7 +183,6 @@ func register(c prometheus.Collector) (*RegisterResponse, error) {
 	}
 
 	return &RegisterResponse{
-		Api:        "1",
 		Registered: ok,
 	}, err
 }

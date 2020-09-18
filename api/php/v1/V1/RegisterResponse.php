@@ -14,10 +14,6 @@ use Google\Protobuf\Internal\GPBUtil;
 class RegisterResponse extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>string api = 1;</code>
-     */
-    private $api = '';
-    /**
      * Generated from protobuf field <code>bool registered = 2;</code>
      */
     private $registered = false;
@@ -28,35 +24,12 @@ class RegisterResponse extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type string $api
      *     @type bool $registered
      * }
      */
     public function __construct($data = NULL) {
         \GPBMetadata\Service::initOnce();
         parent::__construct($data);
-    }
-
-    /**
-     * Generated from protobuf field <code>string api = 1;</code>
-     * @return string
-     */
-    public function getApi()
-    {
-        return $this->api;
-    }
-
-    /**
-     * Generated from protobuf field <code>string api = 1;</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setApi($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->api = $var;
-
-        return $this;
     }
 
     /**
