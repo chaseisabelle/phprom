@@ -42,6 +42,7 @@ func main() {
 	}()
 
 	log.Println("server started")
+	log.Println("listening on " + *adr)
 
 	for !stop.Stopped() {
 	}

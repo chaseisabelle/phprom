@@ -129,7 +129,13 @@ func (p *PHProm) RecordCounter(ctx context.Context, req *phprom_v1.RecordCounter
 		return nil, fmt.Errorf("no counter registered as %s", req.Name)
 	}
 
-	col.With(req.Labels).Add(float64(req.Value))
+	vec, err := col.GetMetricWith(req.Labels)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vec.Add(float64(req.Value))
 
 	return &phprom_v1.RecordResponse{}, nil
 }
@@ -141,7 +147,13 @@ func (p *PHProm) RecordHistogram(ctx context.Context, req *phprom_v1.RecordHisto
 		return nil, fmt.Errorf("no histogram registered as %s", req.Name)
 	}
 
-	col.With(req.Labels).Observe(float64(req.Value))
+	vec, err := col.GetMetricWith(req.Labels)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vec.Observe(float64(req.Value))
 
 	return &phprom_v1.RecordResponse{}, nil
 }
@@ -153,7 +165,13 @@ func (p *PHProm) RecordSummary(ctx context.Context, req *phprom_v1.RecordSummary
 		return nil, fmt.Errorf("no summary registered as %s", req.Name)
 	}
 
-	col.With(req.Labels).Observe(float64(req.Value))
+	vec, err := col.GetMetricWith(req.Labels)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vec.Observe(float64(req.Value))
 
 	return &phprom_v1.RecordResponse{}, nil
 }
@@ -165,7 +183,13 @@ func (p *PHProm) RecordGauge(ctx context.Context, req *phprom_v1.RecordGaugeRequ
 		return nil, fmt.Errorf("no gauge registered as %s", req.Name)
 	}
 
-	col.With(req.Labels).Add(float64(req.Value))
+	vec, err := col.GetMetricWith(req.Labels)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vec.Add(float64(req.Value))
 
 	return &phprom_v1.RecordResponse{}, nil
 }
