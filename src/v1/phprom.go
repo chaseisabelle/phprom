@@ -11,12 +11,14 @@ import (
 
 type PHProm struct{}
 
+var registry *prometheus.Registry
 var counters map[string]*prometheus.CounterVec
 var histograms map[string]*prometheus.HistogramVec
 var summaries map[string]*prometheus.SummaryVec
 var gauges map[string]*prometheus.GaugeVec
 
 func init() {
+	registry = prometheus.NewRegistry()
 	counters = make(map[string]*prometheus.CounterVec)
 	histograms = make(map[string]*prometheus.HistogramVec)
 	summaries = make(map[string]*prometheus.SummaryVec)
@@ -29,7 +31,7 @@ func New() (*PHProm, error) {
 
 func (p *PHProm) Get(ctx context.Context, req *phprom_v1.GetRequest) (*phprom_v1.GetResponse, error) {
 	mfs, err := prometheus.Gatherers{
-		prometheus.DefaultGatherer,
+		registry,
 	}.Gather()
 
 	if err != nil {
@@ -199,7 +201,7 @@ func key(ns string, n string) string {
 }
 
 func register(c prometheus.Collector) (*phprom_v1.RegisterResponse, error) {
-	err := prometheus.DefaultRegisterer.Register(c)
+	err := registry.Register(c)
 
 	_, ok := err.(prometheus.AlreadyRegisteredError)
 

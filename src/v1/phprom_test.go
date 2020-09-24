@@ -329,7 +329,7 @@ func Test_Race_Success(t *testing.T) {
 	sn := "summ"
 	gn := "gauge"
 	lab := []string{"a", "b", "c"}
-	lvs := map[string]string{"a":"A", "b":"B", "c":"C"}
+	lvs := map[string]string{"a": "A", "b": "B", "c": "C"}
 	des := "poop"
 	gos := 100
 	wg := sync.WaitGroup{}
