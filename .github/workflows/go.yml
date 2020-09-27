@@ -31,7 +31,7 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v -race .
+      run: go build -v -race ./src/v1
 
     - name: Test
-      run: go test -v -race .
+      run: go test -v -race ./src/v1
