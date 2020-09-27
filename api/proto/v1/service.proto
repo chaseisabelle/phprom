@@ -23,11 +23,20 @@ message RegisterHistogramRequest {
   repeated float buckets = 5;
 }
 
+message objective {
+  float key = 1;
+  float value = 2;
+}
+
 message RegisterSummaryRequest {
   string namespace = 1;
   string name = 2;
   string description = 3;
   repeated string labels = 4;
+  repeated objective objectives = 5;
+  int64 maxAge = 6;
+  uint32 ageBuckets = 7;
+  uint32 bufCap = 8;
 }
 
 message RegisterGaugeRequest {

@@ -7,6 +7,7 @@ import (
 	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
+	"time"
 )
 
 type PHProm struct{}
@@ -93,10 +94,20 @@ func (p *PHProm) RegisterHistogram(ctx context.Context, req *phprom_v1.RegisterH
 }
 
 func (p *PHProm) RegisterSummary(ctx context.Context, req *phprom_v1.RegisterSummaryRequest) (*phprom_v1.RegisterResponse, error) {
+	obj := make(map[float64]float64)
+
+	for _, o := range req.Objectives {
+		obj[float64(o.Key)] = float64(o.Value)
+	}
+
 	col := prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Namespace: req.Namespace,
-		Name:      req.Name,
-		Help:      req.Description,
+		Namespace:  req.Namespace,
+		Name:       req.Name,
+		Help:       req.Description,
+		Objectives: obj,
+		MaxAge:     time.Duration(req.MaxAge),
+		AgeBuckets: req.AgeBuckets,
+		BufCap:     req.BufCap,
 	}, req.Labels)
 
 	res, err := register(col)

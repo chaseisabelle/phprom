@@ -126,7 +126,7 @@ func Test_Summary_Success(t *testing.T) {
 		t.Errorf("failed to get instance: %+v", err)
 	}
 
-	res1, err := regSumm(srv, ns, nom, des, lab)
+	res1, err := regSumm(srv, ns, nom, des, lab, map[float32]float32{}, 0, 0, 0)
 
 	if err != nil {
 		t.Errorf("failed to register summary: %+v", err)
@@ -276,7 +276,7 @@ func Test_RegisterSummary_Failure(t *testing.T) {
 		t.Errorf("failed to get instance: %+v", err)
 	}
 
-	res, err := regSumm(srv, ns, nom, des, lab)
+	res, err := regSumm(srv, ns, nom, des, lab, map[float32]float32{}, 0, 0, 0)
 
 	if err != nil {
 		t.Errorf("failed to do first summary register: %+v", err)
@@ -286,7 +286,7 @@ func Test_RegisterSummary_Failure(t *testing.T) {
 		t.Errorf("bad reg summary resp: %+v", res)
 	}
 
-	res, err = regSumm(srv, ns, nom, des, []string{"pee"})
+	res, err = regSumm(srv, ns, nom, des, []string{"pee"}, map[float32]float32{}, 0, 0, 0)
 
 	if err == nil {
 		t.Errorf("expected error")
@@ -370,7 +370,7 @@ func Test_Race_Success(t *testing.T) {
 					t.Error(err)
 				}
 
-				_, err = regSumm(srv, ns, sn, des, lab)
+				_, err = regSumm(srv, ns, sn, des, lab, map[float32]float32{}, 0, 0, 0)
 
 				if err != nil {
 					t.Error(err)
@@ -438,12 +438,25 @@ func recHisto(s *PHProm, ns string, n string, l map[string]string, v float32) (*
 	})
 }
 
-func regSumm(s *PHProm, ns string, n string, d string, l []string) (*phprom_v1.RegisterResponse, error) {
+func regSumm(s *PHProm, ns string, n string, d string, l []string, o map[float32]float32, ma int64, b uint32, bc uint32) (*phprom_v1.RegisterResponse, error) {
+	obj := make([]*phprom_v1.Objective, len(o))
+
+	for k, v := range o {
+		obj = append(obj, &phprom_v1.Objective{
+			Key:   k,
+			Value: v,
+		})
+	}
+
 	return s.RegisterSummary(nil, &phprom_v1.RegisterSummaryRequest{
 		Namespace:   ns,
 		Name:        n,
 		Description: d,
 		Labels:      l,
+		Objectives:  obj,
+		MaxAge:      ma,
+		AgeBuckets:  b,
+		BufCap:      bc,
 	})
 }
 
