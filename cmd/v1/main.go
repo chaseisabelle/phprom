@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	adr := flag.String("address", "127.0.0.1:3333", "the host:port to listen on")
+	adr := flag.String("address", "0.0.0.0:3333", "the host:port to listen on")
 
 	flag.Parse()
 
