@@ -10,6 +10,7 @@ a prometheus metric datastore for php apps
 ### usage
 - from command line: `go run cmd/v1/main.go --address=127.0.0.1:3333`
 - get the latest image from [docker](https://hub.docker.com/repository/docker/chaseisabelle/phprom)
+    - `docker run phprom ./phprom --address=127.0.0.1:3333`
 
 ---
 ### api
