@@ -7,23 +7,57 @@ import (
 	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/expfmt"
+	"sync"
 	"time"
 )
 
 type PHProm struct{}
 
+type Counters struct{
+	sync.RWMutex
+	vecs map[string]*prometheus.CounterVec
+}
+
+type Hisograms struct{
+	sync.RWMutex
+	vecs map[string]*prometheus.HistogramVec
+}
+
+type Summaries struct{
+	sync.RWMutex
+	vecs map[string]*prometheus.SummaryVec
+}
+
+type Gauges struct{
+	sync.RWMutex
+	vecs map[string]*prometheus.GaugeVec
+}
+
 var registry *prometheus.Registry
-var counters map[string]*prometheus.CounterVec
-var histograms map[string]*prometheus.HistogramVec
-var summaries map[string]*prometheus.SummaryVec
-var gauges map[string]*prometheus.GaugeVec
+
+var counters Counters
+var histograms Hisograms
+var summaries Summaries
+var gauges Gauges
 
 func init() {
 	registry = prometheus.NewRegistry()
-	counters = make(map[string]*prometheus.CounterVec)
-	histograms = make(map[string]*prometheus.HistogramVec)
-	summaries = make(map[string]*prometheus.SummaryVec)
-	gauges = make(map[string]*prometheus.GaugeVec)
+
+	counters = Counters{
+		vecs: make(map[string]*prometheus.CounterVec),
+	}
+
+	histograms = Hisograms{
+		vecs: make(map[string]*prometheus.HistogramVec),
+	}
+
+	summaries = Summaries{
+		vecs: make(map[string]*prometheus.SummaryVec),
+	}
+
+	gauges = Gauges{
+		vecs: make(map[string]*prometheus.GaugeVec),
+	}
 }
 
 func New() (*PHProm, error) {
@@ -64,7 +98,9 @@ func (p *PHProm) RegisterCounter(ctx context.Context, req *phprom_v1.RegisterCou
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		counters[key(req.Namespace, req.Name)] = col
+		counters.Lock()
+		counters.vecs[key(req.Namespace, req.Name)] = col
+		counters.Unlock()
 	}
 
 	return res, err
@@ -87,7 +123,9 @@ func (p *PHProm) RegisterHistogram(ctx context.Context, req *phprom_v1.RegisterH
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		histograms[key(req.Namespace, req.Name)] = col
+		histograms.Lock()
+		histograms.vecs[key(req.Namespace, req.Name)] = col
+		histograms.Unlock()
 	}
 
 	return res, err
@@ -113,7 +151,9 @@ func (p *PHProm) RegisterSummary(ctx context.Context, req *phprom_v1.RegisterSum
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		summaries[key(req.Namespace, req.Name)] = col
+		summaries.Lock()
+		summaries.vecs[key(req.Namespace, req.Name)] = col
+		summaries.Unlock()
 	}
 
 	return res, err
@@ -129,14 +169,20 @@ func (p *PHProm) RegisterGauge(ctx context.Context, req *phprom_v1.RegisterGauge
 	res, err := register(col)
 
 	if err == nil && !res.Registered {
-		gauges[key(req.Namespace, req.Name)] = col
+		gauges.Lock()
+		gauges.vecs[key(req.Namespace, req.Name)] = col
+		gauges.Unlock()
 	}
 
 	return res, err
 }
 
 func (p *PHProm) RecordCounter(ctx context.Context, req *phprom_v1.RecordCounterRequest) (*phprom_v1.RecordResponse, error) {
-	col, ok := counters[key(req.Namespace, req.Name)]
+	counters.RLock()
+
+	col, ok := counters.vecs[key(req.Namespace, req.Name)]
+
+	counters.RUnlock()
 
 	if !ok {
 		return nil, fmt.Errorf("no counter registered as %s", req.Name)
@@ -154,7 +200,11 @@ func (p *PHProm) RecordCounter(ctx context.Context, req *phprom_v1.RecordCounter
 }
 
 func (p *PHProm) RecordHistogram(ctx context.Context, req *phprom_v1.RecordHistogramRequest) (*phprom_v1.RecordResponse, error) {
-	col, ok := histograms[key(req.Namespace, req.Name)]
+	histograms.RLock()
+
+	col, ok := histograms.vecs[key(req.Namespace, req.Name)]
+
+	histograms.RUnlock()
 
 	if !ok {
 		return nil, fmt.Errorf("no histogram registered as %s", req.Name)
@@ -172,7 +222,11 @@ func (p *PHProm) RecordHistogram(ctx context.Context, req *phprom_v1.RecordHisto
 }
 
 func (p *PHProm) RecordSummary(ctx context.Context, req *phprom_v1.RecordSummaryRequest) (*phprom_v1.RecordResponse, error) {
-	col, ok := summaries[key(req.Namespace, req.Name)]
+	summaries.RLock()
+
+	col, ok := summaries.vecs[key(req.Namespace, req.Name)]
+
+	summaries.RUnlock()
 
 	if !ok {
 		return nil, fmt.Errorf("no summary registered as %s", req.Name)
@@ -190,7 +244,11 @@ func (p *PHProm) RecordSummary(ctx context.Context, req *phprom_v1.RecordSummary
 }
 
 func (p *PHProm) RecordGauge(ctx context.Context, req *phprom_v1.RecordGaugeRequest) (*phprom_v1.RecordResponse, error) {
-	col, ok := gauges[key(req.Namespace, req.Name)]
+	gauges.RLock()
+
+	col, ok := gauges.vecs[key(req.Namespace, req.Name)]
+
+	gauges.RUnlock()
 
 	if !ok {
 		return nil, fmt.Errorf("no gauge registered as %s", req.Name)
