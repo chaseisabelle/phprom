@@ -4,10 +4,10 @@ import (
 	"flag"
 	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
 	"github.com/chaseisabelle/phprom/src/v1"
-	"github.com/chaseisabelle/stop"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"sync"
 )
 
 func main() {
@@ -31,7 +31,11 @@ func main() {
 
 	phprom_v1.RegisterServiceServer(srv, ins)
 
+	wg := sync.WaitGroup{}
+
 	log.Println("starting server...")
+
+	wg.Add(1)
 
 	go func() {
 		err = srv.Serve(lis)
@@ -39,16 +43,19 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		wg.Done()
 	}()
 
 	log.Println("server started")
 	log.Println("listening on " + *adr)
 
-	for !stop.Stopped() {
-	}
+	wg.Wait()
 
 	log.Println("stopping server...")
+
 	srv.GracefulStop()
+
 	log.Println("server stopped")
 	log.Println("i'll be back")
 }
