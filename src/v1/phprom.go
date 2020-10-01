@@ -271,11 +271,14 @@ func key(ns string, n string) string {
 
 func register(c prometheus.Collector) (*phprom_v1.RegisterResponse, error) {
 	err := registry.Register(c)
+	ok := false
 
-	_, ok := err.(prometheus.AlreadyRegisteredError)
+	if err != nil {
+		_, ok = err.(prometheus.AlreadyRegisteredError)
 
-	if ok {
-		err = nil
+		if ok {
+			err = nil
+		}
 	}
 
 	return &phprom_v1.RegisterResponse{
