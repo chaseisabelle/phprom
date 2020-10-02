@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"sync"
 )
 
 func main() {
@@ -30,32 +29,11 @@ func main() {
 	srv := grpc.NewServer()
 
 	phprom_v1.RegisterServiceServer(srv, ins)
-
-	wg := sync.WaitGroup{}
-
-	log.Println("starting server...")
-
-	wg.Add(1)
-
-	go func() {
-		err = srv.Serve(lis)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		wg.Done()
-	}()
-
-	log.Println("server started")
 	log.Println("listening on " + *adr)
 
-	wg.Wait()
+	err = srv.Serve(lis)
 
-	log.Println("stopping server...")
-
-	srv.GracefulStop()
-
-	log.Println("server stopped")
-	log.Println("i'll be back")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
