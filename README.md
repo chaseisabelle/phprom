@@ -2,6 +2,10 @@
 a prometheus metric datastore for php apps
 
 ---
+### example
+see a fully functional example [here](https://github.com/chaseisabelle/phprom-example)
+
+---
 ### prerequisites
 - install the [client](https://github.com/chaseisabelle/phprom-client)
     - `composer require chaseisabelle/phprom-client`
