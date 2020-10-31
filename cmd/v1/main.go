@@ -2,36 +2,25 @@ package main
 
 import (
 	"flag"
-	phprom_v1 "github.com/chaseisabelle/phprom/pkg/v1"
-	"github.com/chaseisabelle/phprom/src/v1"
-	"google.golang.org/grpc"
+	"github.com/chaseisabelle/phprom/srv/v1"
 	"log"
-	"net"
 )
 
 func main() {
 	adr := flag.String("address", "0.0.0.0:3333", "the host:port to listen on")
+	api := flag.String("api", "grpc", "the api to use (grpc, rest, resp)")
 
 	flag.Parse()
 
-	ins, err := v1.New()
+	srv, err := v1.New(v1.API(*api), *adr)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	lis, err := net.Listen("tcp", *adr)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	srv := grpc.NewServer()
-
-	phprom_v1.RegisterServiceServer(srv, ins)
 	log.Println("listening on " + *adr)
 
-	err = srv.Serve(lis)
+	err = srv.Serve()
 
 	if err != nil {
 		log.Fatal(err)
