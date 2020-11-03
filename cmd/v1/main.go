@@ -8,7 +8,7 @@ import (
 
 func main() {
 	adr := flag.String("address", "0.0.0.0:3333", "the host:port to listen on")
-	api := flag.String("api", "grpc", "the api to use (grpc, rest, resp)")
+	api := flag.String("api", string(v1.GrpcApi), "the api to use (grpc, rest, resp)")
 
 	flag.Parse()
 

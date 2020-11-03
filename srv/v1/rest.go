@@ -57,7 +57,7 @@ func (r *RESTServer) get(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.respond(res, gr.GetMetrics())
+	r.respond(res, []byte(gr.GetMetrics()))
 }
 
 func (r *RESTServer) registerCounter(res http.ResponseWriter, req *http.Request) {
@@ -82,7 +82,7 @@ func (r *RESTServer) registerCounter(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) registerHistogram(res http.ResponseWriter, req *http.Request) {
@@ -107,7 +107,7 @@ func (r *RESTServer) registerHistogram(res http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) registerSummary(res http.ResponseWriter, req *http.Request) {
@@ -132,7 +132,7 @@ func (r *RESTServer) registerSummary(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) registerGauge(res http.ResponseWriter, req *http.Request) {
@@ -157,7 +157,7 @@ func (r *RESTServer) registerGauge(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) recordCounter(res http.ResponseWriter, req *http.Request) {
@@ -182,7 +182,7 @@ func (r *RESTServer) recordCounter(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) recordHistogram(res http.ResponseWriter, req *http.Request) {
@@ -207,7 +207,7 @@ func (r *RESTServer) recordHistogram(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) recordSummary(res http.ResponseWriter, req *http.Request) {
@@ -232,7 +232,7 @@ func (r *RESTServer) recordSummary(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) recordGauge(res http.ResponseWriter, req *http.Request) {
@@ -257,7 +257,7 @@ func (r *RESTServer) recordGauge(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	r.respond(res, rrr.String())
+	r.marshal(res, rrr)
 }
 
 func (r *RESTServer) allowed(req *http.Request, res http.ResponseWriter, mth string) bool {
@@ -270,8 +270,20 @@ func (r *RESTServer) allowed(req *http.Request, res http.ResponseWriter, mth str
 	return ok
 }
 
-func (r *RESTServer) respond(res http.ResponseWriter, bod string) {
-	_, err := res.Write([]byte(bod))
+func (r *RESTServer) marshal(res http.ResponseWriter, raw interface{}) {
+	enc, err := json.Marshal(raw)
+
+	if err != nil {
+		r.failure(res, err)
+
+		return
+	}
+
+	r.respond(res, enc)
+}
+
+func (r *RESTServer) respond(res http.ResponseWriter, bod []byte) {
+	_, err := res.Write(bod)
 
 	if err != nil {
 		log.Error(err)

@@ -18,7 +18,7 @@ type Counters struct{
 	vecs map[string]*prometheus.CounterVec
 }
 
-type Hisograms struct{
+type Histograms struct{
 	sync.RWMutex
 	vecs map[string]*prometheus.HistogramVec
 }
@@ -36,7 +36,7 @@ type Gauges struct{
 var registry *prometheus.Registry
 
 var counters Counters
-var histograms Hisograms
+var histograms Histograms
 var summaries Summaries
 var gauges Gauges
 
@@ -47,7 +47,7 @@ func init() {
 		vecs: make(map[string]*prometheus.CounterVec),
 	}
 
-	histograms = Hisograms{
+	histograms = Histograms{
 		vecs: make(map[string]*prometheus.HistogramVec),
 	}
 
