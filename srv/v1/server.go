@@ -10,7 +10,6 @@ func New(api API, adr string) (Server, error) {
 	switch api {
 	case GrpcApi:
 		return newGRPC(adr)
-	case RespApi:
 	case RestApi:
 		return newREST(adr)
 	default:
