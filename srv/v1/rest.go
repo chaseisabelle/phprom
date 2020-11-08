@@ -15,7 +15,7 @@ type RESTServer struct {
 	phprom  *v1.PHProm
 }
 
-func newREST(adr string) (*RESTServer, error) {
+func newRESTServer(adr string) (*RESTServer, error) {
 	php, err := v1.New()
 
 	if err != nil {

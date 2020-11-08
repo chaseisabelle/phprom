@@ -7,12 +7,12 @@ import (
 	"net"
 )
 
-type GRPC struct {
+type GRPCServer struct {
 	server   *grpc.Server
 	listener *net.Listener
 }
 
-func newGRPC(adr string) (*GRPC, error) {
+func newGRPCServer(adr string) (*GRPCServer, error) {
 	ins, err := v1.New()
 
 	if err != nil {
@@ -29,12 +29,12 @@ func newGRPC(adr string) (*GRPC, error) {
 
 	phprom_v1.RegisterServiceServer(srv, ins)
 
-	return &GRPC{
+	return &GRPCServer{
 		server:   srv,
 		listener: &lis,
 	}, nil
 }
 
-func (g *GRPC) Serve() error {
+func (g *GRPCServer) Serve() error {
 	return g.server.Serve(*g.listener)
 }
