@@ -23,7 +23,7 @@ Usage of phprom:
   -address string
     	the host:port to listen on (default "0.0.0.0:3333")
   -api string
-    	the api to use (grpc, rest, resp) (default "grpc")
+    	the api to use (grpc or rest) (default "grpc")
 ```
 
 ---
