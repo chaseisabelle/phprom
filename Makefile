@@ -14,3 +14,15 @@ gen-pb:
         --go_out=plugins=grpc:${PB_OUT} \
         -I/usr/include/github.com/gogo/protobuf \
         ${PROTO_DIR}/service.proto
+
+build:
+	docker build --no-cache --tag phprom:latest .
+
+run:
+	docker run --rm --name phprom phprom:latest
+
+up:
+	make build && make run
+
+rmi:
+	docker rmi phprom:latest
